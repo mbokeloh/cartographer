@@ -17,19 +17,11 @@
 #include "cartographer/pose_graph/constraint/relative_pose_constraint_3d.h"
 
 #include "cartographer/common/make_unique.h"
+#include "cartographer/common/utils.h"
 
 namespace cartographer {
 namespace pose_graph {
 namespace {
-
-// TODO(mbokeloh): Replace with the one in common/utils.h.
-template <typename MapType, typename KeyType = typename MapType::key_type,
-          typename ValueType = typename MapType::mapped_type>
-ValueType* FindOrNull(MapType& map, const KeyType& key) {
-  auto it = map.find(key);
-  if (it == map.end()) return nullptr;
-  return &(it->second);
-}
 
 void AddPoseParameters(Pose3D* pose, ceres::Problem* problem) {
   auto transation = pose->mutable_translation();
@@ -54,13 +46,13 @@ RelativePoseConstraint3D::RelativePoseConstraint3D(
 
 void RelativePoseConstraint3D::AddToOptimizer(Nodes* nodes,
                                               ceres::Problem* problem) const {
-  auto first_node = FindOrNull(nodes->pose_3d_nodes, first_);
+  auto first_node = common::FindOrNull(nodes->pose_3d_nodes, first_);
   if (first_node == nullptr) {
     LOG(INFO) << "First node was not found in pose_2d_nodes.";
     return;
   }
 
-  auto second_node = FindOrNull(nodes->pose_3d_nodes, second_);
+  auto second_node = common::FindOrNull(nodes->pose_3d_nodes, second_);
   if (second_node == nullptr) {
     LOG(INFO) << "Second node was not found in pose_2d_nodes.";
     return;
